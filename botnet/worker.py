@@ -12,7 +12,7 @@ import time
 from gevent import monkey
 monkey.patch_all()
 
-import urllib2
+from urllib.request import urlopen
 
 from gevent import socket
 from gevent.dns import DNSError
@@ -227,7 +227,7 @@ class WorkerBot(BaseWorkerBot):
         path, filename = url.rsplit('/', 1)
         
         try:
-            request = urllib2.urlopen(url)
+            request = urlopen(url)
         except:
             return "failure: unable to fetch %s" % url
         
@@ -300,7 +300,7 @@ class WorkerBot(BaseWorkerBot):
         count = 0
         
         def fetcher(url):
-            req = urllib2.urlopen(url)
+            req = urlopen(url)
             req.read()
         
         while not self.stop_flag.is_set():

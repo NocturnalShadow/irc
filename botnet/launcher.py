@@ -12,7 +12,7 @@ logger = logging.getLogger('botnet.bootstrap')
 
 class BotNetLauncher(object):
     def __init__(self, worker_options, aws_key=None, aws_secret=None, image_id='ami-09d56f8956ab235b3',
-                 instance_type='t1.micro', key_name='ssh', security_group=None, workers=None, quiet=False,
+                 instance_type='t2.micro', key_name='ssh', security_group=None, workers=None, quiet=False,
                  bootstrap_script='bootstrap-worker.sh'):
         
         self.worker_options = worker_options
@@ -67,8 +67,8 @@ class BotNetLauncher(object):
     
     def launch(self):
         if not self.quiet:
-            print 'About to create %d instances' % self.workers
-            if raw_input('Continue Yn ?') == 'n':
+            print('About to create %d instances' % self.workers)
+            if input('Continue Y/n ?') == 'n':
                 sys.exit(0)
 
         ec2 = self.get_conn()
@@ -95,39 +95,39 @@ class BotNetLauncher(object):
             instance.add_tag('irc', '1')
         
         if not self.quiet:
-            print '\nSummary\n'
+            print('\nSummary\n')
             for instance in instances:
-                print '\nInstance ID: %s\n  AMI=%s\n  DNS=%s' % (instance.id, instance.image_id, instance.dns_name)
+                print('\nInstance ID: %s\n  AMI=%s\n  DNS=%s' % (instance.id, instance.image_id, instance.dns_name))
 
         return instances
     
     def terminate(self):
         reservations = self.get_instances()
         instance_ids = [i.id for r in reservations for i in r.instances]
-        print 'About to terminate the following %d instances:\n%s' % (len(instance_ids), ', '.join(instance_ids))
+        print('About to terminate the following %d instances:\n%s' % (len(instance_ids), ', '.join(instance_ids)))
         if raw_input('Really stop? yN ') == 'y':
             ec2 = self.get_conn()
-            print ec2.terminate_instances(instance_ids)
+            print(ec2.terminate_instances(instance_ids))
     
     def show(self):
         reservations = self.get_instances()
         
         if reservations:
             for res in reservations:
-                print 'Reservation %s' % res.id
+                print('Reservation %s' % res.id)
                 for instance in res.instances:
-                    print '\nInstance ID: %s\n  AMI=%s\n  DNS=%s' % (instance.id, instance.image_id, instance.dns_name)
-                print '\n'
+                    print('\nInstance ID: %s\n  AMI=%s\n  DNS=%s' % (instance.id, instance.image_id, instance.dns_name))
+                print('\n')
         else:
-            print 'No reservations found'
+            print('No reservations found')
 
     def help(self):
         parser = get_parser()
         parser.print_help()
 
-        print '\nAvailable commands:'
+        print('\nAvailable commands:')
         for cmd in self.get_command_mapping():
-            print '  - %s' % cmd
+            print('  - %s' % cmd)
     
     def get_command_mapping(self):
         return {
@@ -153,7 +153,7 @@ def get_parser():
     boto_ops.add_option('--ami', dest='image_id', default='ami-09d56f8956ab235b3')
     boto_ops.add_option('--key', dest='aws_key')
     boto_ops.add_option('--secret', dest='aws_secret')
-    boto_ops.add_option('--type', dest='instance_type', default='t1.micro')
+    boto_ops.add_option('--type', dest='instance_type', default='t2.micro')
     boto_ops.add_option('--key-name', dest='key_name', default='ssh', help='Security key name (e.g. master-key)')
     boto_ops.add_option('--group', dest='security_group', default='launch-wizard-1', help='Security group (e.g. default)')
     
@@ -203,15 +203,15 @@ if __name__ == '__main__':
     
     if args:
         if len(args) != 1:
-            print 'Error, incorrect number of arguments specified'
+            print('Error, incorrect number of arguments specified')
             parser.print_help()
             sys.exit(1)
         cmd = args[0]
         try:
             launcher.handle(cmd)
         except KeyError:
-            print 'Unknown command %s' % cmd
-            print 'Valid commands: %s' % (', '.join(launcher.get_command_mapping().keys()))
+            print('Unknown command %s' % cmd)
+            print('Valid commands: %s' % (', '.join(launcher.get_command_mapping().keys())))
             parser.print_help()
             sys.exit(2)
     else:
