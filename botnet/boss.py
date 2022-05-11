@@ -343,7 +343,8 @@ if __name__ == '__main__':
     parser = get_parser()
     (options, args) = parser.parse_args()
     
-    conn = IRCConnection(options.server, options.port, options.nick,
+    conn = IRCConnection(options.server, options.port, 
+        options.nick, options.secret,
         options.logfile, options.verbosity)
     conn.connect()
     
