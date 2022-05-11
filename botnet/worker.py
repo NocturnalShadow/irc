@@ -15,7 +15,6 @@ monkey.patch_all()
 from urllib.request import urlopen
 
 from gevent import socket
-from gevent.dns import DNSError
 from gevent.event import Event
 from gevent.queue import Queue
 
@@ -180,8 +179,6 @@ class Conn(object):
         
         try:
             self._sock.connect((self.host, self.port))
-        except DNSError:
-            pass
         except socket.error:
             pass
         else:
