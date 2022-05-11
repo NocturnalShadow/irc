@@ -328,12 +328,12 @@ def get_parser():
     parser = OptionParser(usage='%prog [options]')
     parser.add_option('--server', '-s', dest='server', default='irc.freenode.net',
         help='IRC server to connect to')
-    parser.add_option('--port', '-p', dest='port', default=6667,
+    parser.add_option('--port', '-p', dest='port', default=6677,
         help='Port to connect on', type='int')
-    parser.add_option('--nick', '-n', dest='nick', default='boss1337',
+    parser.add_option('--nick', '-n', dest='nick', default='boss',
         help='Nick to use')
     parser.add_option('--secret', '-x', dest='secret', default='password')
-    parser.add_option('--channel', '-c', dest='channel', default='#botwars-test')
+    parser.add_option('--channel', '-c', dest='channel', default='#botnet')
     parser.add_option('--logfile', '-f', dest='logfile')
     parser.add_option('--verbosity', '-v', dest='verbosity', default=1, type='int')
     

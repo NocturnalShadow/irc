@@ -11,9 +11,9 @@ logger = logging.getLogger('botnet.bootstrap')
 
 
 class BotNetLauncher(object):
-    def __init__(self, worker_options, aws_key=None, aws_secret=None, image_id='ami-ab36fbc2',
-                 instance_type='t1.micro', key_name=None, security_group=None, workers=None, quiet=False,
-                 bootstrap_script='bootstrap.sh'):
+    def __init__(self, worker_options, aws_key=None, aws_secret=None, image_id='ami-09d56f8956ab235b3',
+                 instance_type='t1.micro', key_name='ssh', security_group=None, workers=None, quiet=False,
+                 bootstrap_script='bootstrap-worker.sh'):
         
         self.worker_options = worker_options
         self.aws_key = aws_key
@@ -147,23 +147,23 @@ def get_parser():
     parser.add_option('--workers', dest='workers', type='int', default=1,
         help='Number of instances/workers to start')
     parser.add_option('--quiet', '-q', dest='quiet', action='store_true')
-    parser.add_option('--script', dest='bootstrap_script', default='bootstrap.sh')
+    parser.add_option('--script', dest='bootstrap_script', default='bootstrap-worker.sh')
     
     boto_ops = parser.add_option_group('EC2 options')
-    boto_ops.add_option('--ami', dest='image_id', default='ami-ab36fbc2')
+    boto_ops.add_option('--ami', dest='image_id', default='ami-09d56f8956ab235b3')
     boto_ops.add_option('--key', dest='aws_key')
     boto_ops.add_option('--secret', dest='aws_secret')
     boto_ops.add_option('--type', dest='instance_type', default='t1.micro')
-    boto_ops.add_option('--key-name', dest='key_name', help='Security key name (e.g. master-key)')
-    boto_ops.add_option('--group', dest='security_group', help='Security group (e.g. default)')
+    boto_ops.add_option('--key-name', dest='key_name', default='ssh', help='Security key name (e.g. master-key)')
+    boto_ops.add_option('--group', dest='security_group', default='launch-wizard-1', help='Security group (e.g. default)')
     
     # --- for workers ---
     worker_ops = parser.add_option_group('Worker options')
     worker_ops.add_option('--server', '-s', dest='server',
         help='IRC server to connect to')
-    worker_ops.add_option('--port', '-p', dest='port',
+    worker_ops.add_option('--port', '-p', default='6677', dest='port',
         help='Port to connect on', type='int')
-    worker_ops.add_option('--nick', '-n', dest='nick',
+    worker_ops.add_option('--nick', '-n', default='worker', dest='nick',
         help='Nick to use')
     worker_ops.add_option('--boss', '-b', dest='boss')
     worker_ops.add_option('--logfile', '-f', dest='logfile')
