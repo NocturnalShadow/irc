@@ -401,6 +401,7 @@ def get_parser():
     parser.add_option('--nick', '-n', dest='nick', default='worker',
         help='Nick to use')
     parser.add_option('--boss', '-b', dest='boss', default='boss')
+    parser.add_option('--secret', '-x', dest='secret', default='password')
     parser.add_option('--logfile', '-f', dest='logfile')
     parser.add_option('--verbosity', '-v', dest='verbosity', default=1, type='int')
     
@@ -411,7 +412,8 @@ if __name__ == '__main__':
     parser = get_parser()
     (options, args) = parser.parse_args()
     
-    conn = IRCConnection(options.server, options.port, options.nick,
+    conn = IRCConnection(options.server, options.port, 
+        options.nick, options.secret,
         options.logfile, options.verbosity)
     conn.connect()
     

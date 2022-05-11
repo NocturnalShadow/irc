@@ -166,6 +166,7 @@ def get_parser():
     worker_ops.add_option('--nick', '-n', default='worker', dest='nick',
         help='Nick to use')
     worker_ops.add_option('--boss', '-b', dest='boss')
+    worker_ops.add_option('--boss-secret', '-x', dest='boss_secret', default='password')
     worker_ops.add_option('--logfile', '-f', dest='logfile')
     worker_ops.add_option('--verbosity', '-v', dest='verbosity')
     
@@ -180,6 +181,7 @@ if __name__ == '__main__':
         'port': 'p',
         'nick': 'n',
         'boss': 'b',
+        'boss_secret': 'x',
         'logfile': 'f',
         'verbosity': 'v',
     }
