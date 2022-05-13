@@ -80,6 +80,7 @@ class BotNetLauncher(object):
         reservation = ec2.run_instances(
             self.image_id,
             min_count=self.workers,
+            max_count=self.workers,
             key_name=self.key_name,
             security_groups=self.security_group,
             instance_type=self.instance_type,
@@ -105,7 +106,7 @@ class BotNetLauncher(object):
         reservations = self.get_instances()
         instance_ids = [i.id for r in reservations for i in r.instances]
         print('About to terminate the following %d instances:\n%s' % (len(instance_ids), ', '.join(instance_ids)))
-        if raw_input('Really stop? yN ') == 'y':
+        if input('Really terminate? y/n ') == 'y':
             ec2 = self.get_conn()
             print(ec2.terminate_instances(instance_ids))
     

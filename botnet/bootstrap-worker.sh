@@ -5,4 +5,4 @@ git clone https://github.com/NocturnalShadow/irc.git ~/irc
 cd ~/irc
 pip install -r requirements.txt
 python -m pip install -e .
-python ./botnet/worker.py %(worker_options)s
+nohup ./botnet/worker.py %(worker_options)s > worker.log &

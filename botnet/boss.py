@@ -144,7 +144,7 @@ class BotnetBot(IRCBot):
             # find all workers who didn't respond to the ping
             for worker_nick, worker in self.workers.items():
                 if worker.awaiting_ping.is_set():
-                    self.conn_logger.warn('worker [%s] is dead' % worker_nick)
+                    self.conn_logger.warning('worker [%s] is dead' % worker_nick)
                     dead.append(worker_nick)
             
             if dead:
@@ -276,7 +276,7 @@ class BotnetBot(IRCBot):
             self.workers[nick] = BotnetWorker(nick, hostname)
             self.logger.info('added worker [%s]' % nick)
         else:
-            self.logger.warn('already registered [%s]' % nick)
+            self.logger.warning('already registered [%s]' % nick)
         
         return '!register-success %s' % self.cmd_channel
     

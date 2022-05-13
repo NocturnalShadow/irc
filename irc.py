@@ -180,7 +180,7 @@ class IRCConnection(object):
         """
         old = self.nick
         self.nick = '%s_%s' % (self.base_nick, random.randint(1, 1000))
-        self.logger.warn('Nick %s already taken, trying %s' % (old, self.nick))
+        self.logger.warning('Nick %s already taken, trying %s' % (old, self.nick))
         self.register_nick()
         self.handle_nick_change(old, self.nick)
 
