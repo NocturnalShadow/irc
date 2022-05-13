@@ -257,12 +257,12 @@ class IRCConnection(object):
             except socket.error as msg:
                 self.logger.warning('unable to read from socket: %s' % msg)
                 data = None
-                continue
 
             if not data:
-                self.logger.info('server closed connection')
-                self.close()
-                return True
+                self.logger.warning('no data recieved from server')
+                continue
+                # self.close()
+                # return True
 
             data = data.rstrip()
 
