@@ -24,7 +24,7 @@ class IRCConnection(object):
     nick_change_re = re.compile(':(?P<old_nick>.*?)!\S+\s+?NICK\s+:\s*(?P<new_nick>[-\w]+)')
     ping_re = re.compile('^PING (?P<payload>.*)')
     chanmsg_re = re.compile(':(?P<nick>.*?)!\S+\s+?PRIVMSG\s+(?P<channel>#+[-\w]+)\s+:(?P<message>[^\n\r]+)')
-    privmsg_re = re.compile(':(?P<nick>.*?)!~\S+\s+?PRIVMSG\s+[^#][^:]+:(?P<message>[^\n\r]+)')
+    privmsg_re = re.compile(':(?P<nick>.*?)!\S+\s+?PRIVMSG\s+[^#][^:]+:(?P<message>[^\n\r]+)')
     part_re = re.compile(':(?P<nick>.*?)!\S+\s+?PART\s+(?P<channel>#+[-\w]+)')
     join_re = re.compile(':(?P<nick>.*?)!\S+\s+?JOIN\s+.*?(?P<channel>#+[-\w]+)')
     quit_re = re.compile(':(?P<nick>.*?)!\S+\s+?QUIT\s+.*')
@@ -202,7 +202,7 @@ class IRCConnection(object):
         data.
         """
         if not self._registered:
-            self.logger.info('Registered')
+            self.logger.info('Registered connection to ' + server)
             self._registered = True
             for data in self._out_buffer:
                 self.send(data)
@@ -353,7 +353,7 @@ class SimpleSerialize(object):
     * Only supports dictionaries *
     """
     def serialize(self, dictionary):
-        return '|'.join(('%s:%s' % (k, v) for k, v in dictionary.iteritems()))
+        return '|'.join(('%s:%s' % (k, v) for k, v in dictionary.items()))
 
     def deserialize(self, string):
         return dict((piece.split(':', 1) for piece in string.split('|')))

