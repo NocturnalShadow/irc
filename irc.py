@@ -93,8 +93,8 @@ class IRCConnection(object):
             self._sock = ssl.wrap_socket(self._sock)
         try:
             self._sock.connect((self.server, self.port))
-        except socket.error:
-            self.logger.error('Unable to connect to %s on port %d' % (self.server, self.port), exc_info=1)
+        except socket.error as msg:
+            self.logger.error('Unable to connect to %s on port %d because %s' % (self.server, self.port, msg), exc_info=1)
             return False
 
         self._sock_file = self._sock.makefile(mode='rw')
@@ -254,8 +254,10 @@ class IRCConnection(object):
         while 1:
             try:
                 data = self._sock_file.readline()
-            except socket.error:
+            except socket.error as msg:
+                self.logger.warning('unable to read from socket: %s' % msg)
                 data = None
+                continue
 
             if not data:
                 self.logger.info('server closed connection')

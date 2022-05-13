@@ -117,7 +117,7 @@ class BotNetLauncher(object):
             for res in reservations:
                 print('Reservation %s' % res.id)
                 for instance in res.instances:
-                    print('\nInstance ID: %s\n  AMI=%s\n  DNS=%s' % (instance.id, instance.image_id, instance.dns_name))
+                    print('\nInstance ID: %s\n  AMI = %s\n  DNS = %s' % (instance.id, instance.image_id, instance.dns_name))
                 print('\n')
         else:
             print('No reservations found')
