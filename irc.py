@@ -92,13 +92,16 @@ class IRCConnection(object):
         self._sock.settimeout(0)
         if self.use_ssl:
             self._sock = ssl.wrap_socket(self._sock)
-        try:
-            self._sock.connect((self.server, self.port))
-        except socket.error as msg:
-            self.logger.error('Unable to connect to %s on port %d because %s' % (self.server, self.port, msg), exc_info=1)
-            return False
 
-        self._sock_file = self._sock.makefile(mode='rw')
+        while 1:
+            try:
+                self._sock.connect((self.server, self.port))
+                self._sock_file = self._sock.makefile(mode='rw')
+                break
+            except socket.error as msg:
+                self.logger.error('Unable to connect to %s on port %d because %s' % (self.server, self.port, msg), exc_info=1)
+                time.sleep(15)
+
         if self.password:
             self.set_password()
         self.register_nick()
@@ -259,6 +262,7 @@ class IRCConnection(object):
                 data = None
 
             if not data:
+                time.sleep(1)
                 continue
                 # self.close()
                 # return True
