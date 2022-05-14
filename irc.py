@@ -89,6 +89,7 @@ class IRCConnection(object):
         Connect to the IRC server using the nickname
         """
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self._sock.settimeout(0)
         if self.use_ssl:
             self._sock = ssl.wrap_socket(self._sock)
         try:
@@ -254,12 +255,10 @@ class IRCConnection(object):
         while 1:
             try:
                 data = self._sock_file.readline()
-            except socket.error as msg:
-                self.logger.warning('unable to read from socket: %s' % msg)
+            except socket.error:
                 data = None
 
             if not data:
-                self.logger.warning('no data recieved from server')
                 continue
                 # self.close()
                 # return True
