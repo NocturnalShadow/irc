@@ -81,15 +81,18 @@ class IRCConnection(object):
         if self._registered or force:
             self._sock_file.write('%s\r\n' % data)
             self._sock_file.flush()
+            self.logger.debug('Raw-sent %s' % (data), exc_info=1)
         else:
             self._out_buffer.append(data)
+            self.logger.debug('Buffered %s' % (data), exc_info=1)
+
 
     def connect(self):
         """\
         Connect to the IRC server using the nickname
         """
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self._sock.settimeout(0)
+        # self._sock.settimeout(0)
         if self.use_ssl:
             self._sock = ssl.wrap_socket(self._sock)
 
@@ -259,15 +262,19 @@ class IRCConnection(object):
             try:
                 data = self._sock_file.readline()
             except socket.error:
+                # sock.setblocking(False)
+                # sock.setblocking(True)
                 data = None
 
             if not data:
-                time.sleep(1)
+                self.logger.debug('Actually: ' + self._sock.recv(64, socket.MSG_PEEK).decode('utf-8'))
+                time.sleep(10)
                 continue
                 # self.close()
-                # return True
+                # return True_sock
 
             data = data.rstrip()
+            self.logger.debug(data)
 
             for pattern, callback in patterns:
                 match = pattern.match(data)
