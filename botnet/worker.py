@@ -412,10 +412,11 @@ if __name__ == '__main__':
     parser = get_parser()
     (options, args) = parser.parse_args()
     
-    conn = IRCConnection(options.server, options.port, 
-        options.nick, options.secret,
-        options.logfile, options.verbosity)
-    conn.connect()
-    
-    bot = WorkerBot(conn, options.boss)
-    conn.enter_event_loop()
+    while 1:
+        conn = IRCConnection(options.server, options.port,
+            options.nick, options.secret,
+            options.logfile, options.verbosity)
+        conn.connect()
+        
+        bot = WorkerBot(conn, options.boss)
+        conn.enter_event_loop()

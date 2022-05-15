@@ -6,10 +6,10 @@ import sys
 import time
 import ssl
 
-try:
-    from gevent import socket
-except ImportError:
-    import socket
+# try:
+#     from gevent import socket
+# except ImportError:
+import socket
 
 from logging.handlers import RotatingFileHandler
 from optparse import OptionParser
@@ -92,7 +92,6 @@ class IRCConnection(object):
         Connect to the IRC server using the nickname
         """
         self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        # self._sock.settimeout(0)
         if self.use_ssl:
             self._sock = ssl.wrap_socket(self._sock)
 
@@ -258,20 +257,20 @@ class IRCConnection(object):
         patterns = self.dispatch_patterns()
         self.logger.debug('entering receive loop')
 
+        retries = 5
         while 1:
             try:
                 data = self._sock_file.readline()
             except socket.error:
-                # sock.setblocking(False)
-                # sock.setblocking(True)
                 data = None
 
             if not data:
-                self.logger.debug('Actually: ' + self._sock.recv(64, socket.MSG_PEEK).decode('utf-8'))
-                time.sleep(10)
-                continue
-                # self.close()
-                # return True_sock
+                if retries > 0:
+                    time.sleep(5)
+                    retries -= 1
+                    continue
+                self.close()
+                return False
 
             data = data.rstrip()
             self.logger.debug(data)
