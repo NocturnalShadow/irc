@@ -349,5 +349,4 @@ if __name__ == '__main__':
     conn.connect()
     
     bot = BotnetBot(conn, options.secret, options.channel)
-    
     conn.enter_event_loop()

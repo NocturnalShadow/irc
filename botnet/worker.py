@@ -8,6 +8,9 @@ import random
 import re
 import sys
 import time
+import shlex
+import signal
+import subprocess
 
 from gevent import monkey
 monkey.patch_all()
@@ -47,6 +50,9 @@ class BaseWorkerBot(IRCBot):
         
         # flag to allow stopping currently running task at any time
         self.stop_flag = Event()
+
+        # Popen object of the processes currently execute
+        self.task_process = None
         
         # start 2 greenlets, one to ensure the worker gets registered and
         # the other to pull tasks from the queue and execute them
@@ -86,7 +92,7 @@ class BaseWorkerBot(IRCBot):
                     
                     # clear the stop flag in the event it was set
                     self.stop_flag.clear()
-                    
+
                     # send output of command to channel
                     for line in ret.splitlines():
                         self.respond('!task-data %s:%s' % (task_id, line), self.channel)
@@ -150,6 +156,9 @@ class BaseWorkerBot(IRCBot):
         """\
         Hook to allow any task to be stopped (provided the task checks the stop flag)
         """
+        if self.task_process is not None:
+            self.task_process.kill()
+
         self.stop_flag.set()
     
     def worker_ping_handler(self, nick, message, channel):
@@ -265,8 +274,32 @@ class WorkerBot(BaseWorkerBot):
         return str(open_ports)
     
     def run(self, program):
-        fh = os.popen(program)
-        return fh.read()
+        if program != "show": 
+            self.task_process = subprocess.Popen(shlex.split(program),
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                shell=False,
+                bufsize=0,
+                universal_newlines=True)
+        elif self.task_process is None:
+            return ""
+
+        try:
+            self.task_process.wait(timeout=10)
+        except subprocess.TimeoutExpired:
+            lines = []
+            signal.signal(signal.SIGALRM, lambda: 0/0)
+            signal.alarm(5) # time out in seconds
+            try:
+                for line in iter(self.task_process.stdout.readline, b''):
+                    lines.append(line.rstrip())
+                signal.alarm(0)
+            except Exception:
+                pass
+
+            return "\n".join(lines[:10])
+        else:
+            return "\n".join(self.task_process.stdout.read().splitlines()[:10])
     
     def send_file(self, filename, destination):
         try:
