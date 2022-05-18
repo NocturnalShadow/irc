@@ -170,7 +170,7 @@ class BotnetBot(IRCBot):
             ('\/quit', self.quit_handler),
             ('!auth (?P<password>.+)', self.auth),
             ('!execute (?:(?P<num_workers>\d+)? )?(?P<command>.+)', self.require_boss(self.execute_task)),
-            ('!print(?: (?P<task_id>\d+))?', self.require_boss(self.print_task)),
+            ('!print(?: (?P<task_id>\d+))?(?: (?P<worker_nick>\w+))?', self.require_boss(self.print_task)),
             ('!register (?P<hostname>.+)', self.register),
             ('!stop', self.require_boss(self.stop)),
             ('!status', self.require_boss(self.status)),
@@ -247,7 +247,7 @@ class BotnetBot(IRCBot):
         ))
         self.respond('!worker-execute %s:%s' % (task.id, task.command), nick=worker.nick)
     
-    def print_task(self, nick, message, channel, task_id=None):
+    def print_task(self, nick, message, channel, task_id=None, worker_nick=None):
         if not self.tasks:
             return 'No tasks to print'
         
@@ -256,11 +256,12 @@ class BotnetBot(IRCBot):
         
         def printer(task):
             for nick, data in task.data.items():
-                worker = self.workers[nick]
-                self.send_user('[%s:%s] - %s' % (worker.nick, worker.name, task.command))
-                for line in data.splitlines():
-                    self.send_user(line.strip())
-                    gevent.sleep(.2)
+                if worker_nick is None or nick == worker_nick:
+                    worker = self.workers[nick]
+                    self.send_user('[%s:%s] - %s' % (worker.nick, worker.name, task.command))
+                    for line in data.splitlines():
+                        self.send_user(line.strip())
+                        gevent.sleep(.2)
         
         gevent.spawn(printer, task)
     

