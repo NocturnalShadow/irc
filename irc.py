@@ -6,10 +6,10 @@ import sys
 import time
 import ssl
 
-# try:
-#     from gevent import socket
-# except ImportError:
-import socket
+try:
+    from gevent import socket
+except ImportError:
+    import socket
 
 from logging.handlers import RotatingFileHandler
 from optparse import OptionParser

